@@ -24,7 +24,7 @@ export async function POST(req: Request) {
             await prisma.$transaction(
                 items.map((item: any) =>
                     prisma.group.update({
-                        where: { id: item.id, userId: session.user.id },
+                        where: { id: item.id, userId: session.user!.id },
                         data: { order: item.order }
                     })
                 )
