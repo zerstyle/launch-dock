@@ -1,0 +1,10 @@
+{
+    "manifest_version": 3,
+    "name": "Launch Dock New Tab",
+    "version": "1.0",
+    "description": "Replaces the new tab page with Launch Dock",
+    "chrome_url_overrides": {
+        "newtab": "index.html"
+    },
+    "permissions": []
+}

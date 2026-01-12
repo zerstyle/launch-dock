@@ -31,7 +31,7 @@ import { GroupCard } from "@/components/bookmarks/group-card";
 import { BookmarkItem } from "@/components/bookmarks/bookmark-item";
 import { BookmarkModal } from "@/components/bookmarks/bookmark-modal";
 import { GroupModal } from "@/components/bookmarks/group-modal";
-import { Plus, LogOut, Settings, ChevronDown, ChevronRight, ChevronsDown, ChevronsRight } from "lucide-react";
+import { Plus, LogOut, Settings, ChevronDown, ChevronRight, ChevronsDown, ChevronsRight, ChevronsUp } from "lucide-react";
 import { Bookmark } from "@prisma/client";
 import { signOut } from "next-auth/react";
 import { GroupWithBookmarks } from "@/hooks/use-groups";
@@ -586,7 +586,7 @@ export default function DashboardPage() {
                             className="flex items-center gap-1 px-2 sm:px-3 py-1.5 text-xs font-medium text-white/60 hover:text-white rounded-lg hover:bg-white/5 transition-colors"
                             title="Collapse All"
                         >
-                            <ChevronsRight size={16} />
+                            <ChevronsUp size={16} />
                             <span className="hidden sm:inline">Collapse All</span>
                         </button>
                         <button
