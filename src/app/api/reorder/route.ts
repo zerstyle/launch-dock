@@ -11,6 +11,8 @@ export async function POST(req: Request) {
         return new NextResponse("Unauthorized", { status: 401 });
     }
 
+    const userId = session.user.id;
+
     try {
         const { type, items } = await req.json();
 
@@ -24,7 +26,7 @@ export async function POST(req: Request) {
             await prisma.$transaction(
                 items.map((item: any) =>
                     prisma.group.update({
-                        where: { id: item.id, userId: session.user!.id },
+                        where: { id: item.id, userId: userId },
                         data: { order: item.order }
                     })
                 )
