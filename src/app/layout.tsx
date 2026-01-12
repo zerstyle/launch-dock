@@ -8,6 +8,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Launch Dock",
   description: "Your personal bookmark launcher",
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
