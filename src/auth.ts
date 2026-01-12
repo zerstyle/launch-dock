@@ -19,10 +19,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             if (account?.provider === "google") {
                 if (!user.email) return false;
 
+                console.log("[SignIn Check] Attempting login with:", user.email);
+
                 // Whitelist Check: Only allow users that already exist in DB
                 const existingUser = await prisma.user.findUnique({
                     where: { email: user.email },
                 });
+
+                console.log("[SignIn Check] DB Lookup Result:", existingUser);
 
                 if (!existingUser) {
                     console.log("Access Denied: Email not registered by admin");
