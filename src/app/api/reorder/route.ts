@@ -11,7 +11,8 @@ export async function POST(req: Request) {
         return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const userId = session.user.id;
+    // Fix for Vercel Build: Explicitly capture userId to ensure type safety
+    const currentUserId = session.user.id as string;
 
     try {
         const { type, items } = await req.json();
@@ -26,7 +27,7 @@ export async function POST(req: Request) {
             await prisma.$transaction(
                 items.map((item: any) =>
                     prisma.group.update({
-                        where: { id: item.id, userId: userId },
+                        where: { id: item.id, userId: currentUserId },
                         data: { order: item.order }
                     })
                 )
