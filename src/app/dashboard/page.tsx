@@ -465,24 +465,34 @@ export default function DashboardPage() {
             const sourceGroupMutable = newGroups.find(g => g.id === sourceGroup.id)!;
             const destGroupMutable = newGroups.find(g => g.id === destGroup.id)!;
 
-            // Remove from source
-            const sourceIndex = sourceGroupMutable.bookmarks.findIndex((b: Bookmark) => b.id === activeBookmarkId);
-            const [movedBookmark] = sourceGroupMutable.bookmarks.splice(sourceIndex, 1);
-            movedBookmark.groupId = destGroup.id; // Update group ID
-
-            // Insert into dest
-            if (over.data.current?.type === "Group") {
-                // Dropped on Group Card -> Append
-                destGroupMutable.bookmarks.push(movedBookmark);
-            } else {
-                // Dropped on another bookmark -> Insert before/after
+            // If same group, use arrayMove (handles index calculation correctly)
+            if (sourceGroup.id === destGroup.id) {
+                const sourceIndex = sourceGroupMutable.bookmarks.findIndex((b: Bookmark) => b.id === activeBookmarkId);
                 const overIndex = destGroupMutable.bookmarks.findIndex((b: Bookmark) => b.id === overId);
-                if (overIndex >= 0) {
-                    // dnd-kit usually drops 'over' meaning replace or displace.
-                    // we insert at that index.
-                    destGroupMutable.bookmarks.splice(overIndex, 0, movedBookmark);
-                } else {
+
+                if (sourceIndex !== -1 && overIndex !== -1) {
+                    destGroupMutable.bookmarks = arrayMove(destGroupMutable.bookmarks, sourceIndex, overIndex);
+                }
+            } else {
+                // Cross-group moving
+                // Remove from source
+                const sourceIndex = sourceGroupMutable.bookmarks.findIndex((b: Bookmark) => b.id === activeBookmarkId);
+                const [movedBookmark] = sourceGroupMutable.bookmarks.splice(sourceIndex, 1);
+                movedBookmark.groupId = destGroup.id; // Update group ID
+
+                // Insert into dest
+                if (over.data.current?.type === "Group") {
+                    // Dropped on Group Card -> Append
                     destGroupMutable.bookmarks.push(movedBookmark);
+                } else {
+                    // Dropped on another bookmark -> Insert before/after
+                    // Since it's cross-group, overIndex is valid in the destination array
+                    const overIndex = destGroupMutable.bookmarks.findIndex((b: Bookmark) => b.id === overId);
+                    if (overIndex >= 0) {
+                        destGroupMutable.bookmarks.splice(overIndex, 0, movedBookmark);
+                    } else {
+                        destGroupMutable.bookmarks.push(movedBookmark);
+                    }
                 }
             }
 
