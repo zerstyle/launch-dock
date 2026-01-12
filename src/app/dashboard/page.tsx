@@ -550,9 +550,9 @@ export default function DashboardPage() {
     return (
         <div className="min-h-screen bg-[#050505] bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))] text-white">
             <header className="sticky top-0 z-40 w-full backdrop-blur-xl border-b border-white/5 bg-black/20">
-                <div className="w-full px-8 h-16 flex items-center justify-between">
+                <div className="w-full px-4 sm:px-8 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-purple-500 to-blue-500 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-purple-500 to-blue-500 flex items-center justify-center shrink-0">
                             <span className="font-bold text-white text-lg">{dashboardTitle.charAt(0).toUpperCase()}</span>
                         </div>
                         <input
@@ -565,15 +565,15 @@ export default function DashboardPage() {
                                     e.currentTarget.blur();
                                 }
                             }}
-                            className="bg-transparent border-none text-white font-bold tracking-tight text-lg focus:outline-none focus:ring-2 focus:ring-purple-500/50 rounded px-2 py-1 min-w-[100px]"
+                            className="bg-transparent border-none text-white font-bold tracking-tight text-lg focus:outline-none focus:ring-2 focus:ring-purple-500/50 rounded px-2 py-1 min-w-[50px] max-w-[120px] sm:max-w-none truncate"
                             spellCheck={false}
                         />
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1 sm:gap-2 shrink-0">
                         <button
                             onClick={() => handleToggleAll(true)}
-                            className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-white/60 hover:text-white rounded-lg hover:bg-white/5 transition-colors"
+                            className="flex items-center gap-1 px-2 sm:px-3 py-1.5 text-xs font-medium text-white/60 hover:text-white rounded-lg hover:bg-white/5 transition-colors"
                             title="Collapse All"
                         >
                             <ChevronsRight size={16} />
