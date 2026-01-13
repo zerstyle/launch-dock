@@ -30,16 +30,22 @@ import { GroupCard } from "@/components/bookmarks/group-card";
 import { BookmarkItem } from "@/components/bookmarks/bookmark-item";
 import { BookmarkModal } from "@/components/bookmarks/bookmark-modal";
 import { GroupModal } from "@/components/bookmarks/group-modal";
-import { Plus, LogOut, Settings, ChevronDown, ChevronRight, ChevronsDown, ChevronsRight, ChevronsUp, WifiOff } from "lucide-react";
+import { Plus, LogOut, Settings, ChevronDown, ChevronRight, ChevronsDown, ChevronsRight, ChevronsUp, WifiOff, Loader2 } from "lucide-react";
 import { Bookmark } from "@prisma/client";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { GroupWithBookmarks } from "@/hooks/use-groups";
 import { DeleteConfirmationModal } from "@/components/ui/delete-confirmation-modal";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
-    const { groups, isLoading, mutate } = useGroups();
+    const { groups, isLoading, mutate, isError } = useGroups();
+    const { data: session, status } = useSession();
+    const router = useRouter();
     const [isMounted, setIsMounted] = useState(false);
+
+    // Syncing State (Initial 2s)
+    const [isSyncing, setIsSyncing] = useState(true);
 
     // Online Status State
     const [isOnline, setIsOnline] = useState(true);
@@ -64,9 +70,22 @@ export default function DashboardPage() {
 
     useEffect(() => {
         setIsMounted(true);
-        // Initial check
+        // Initial online check
         setIsOnline(navigator.onLine);
 
+        // Syncing UI Logic
+        const timer = setTimeout(() => {
+            setIsSyncing(false);
+
+            // Post-sync checks (after 2s)
+            // Only check auth if we are absolutely sure session is loaded or failed
+            if (status === "unauthenticated") {
+                toast.error("로그인이 필요합니다.");
+                router.push("/login");
+            }
+        }, 2000);
+
+        // Events
         const handleOnline = () => {
             setIsOnline(true);
             toast.success("Online: Syncing changes...");
@@ -88,13 +107,16 @@ export default function DashboardPage() {
                     setDashboardTitle(data.dashboardTitle);
                 }
             })
-            .catch(err => console.error("Failed to load user settings", err));
+            .catch(err => {
+                // Silent fail or low priority log
+            });
 
         return () => {
+            clearTimeout(timer);
             window.removeEventListener('online', handleOnline);
             window.removeEventListener('offline', handleOffline);
         };
-    }, [mutate]);
+    }, [mutate, status, router]);
 
     const checkOnline = () => {
         if (!navigator.onLine) {
@@ -143,8 +165,8 @@ export default function DashboardPage() {
         [activeType]
     );
 
+    // Remove blocking loading check to allow cached view
     if (!isMounted) return <div className="min-h-screen bg-slate-950" />;
-    if (isLoading) return <div className="min-h-screen flex items-center justify-center text-white bg-slate-950">Loading...</div>;
 
     // --- Handlers ---
     const handleToggleCollapse = async (group: GroupWithBookmarks) => {
@@ -532,8 +554,15 @@ export default function DashboardPage() {
             <header className="sticky top-0 z-40 w-full backdrop-blur-xl border-b border-white/5 bg-black/20">
                 <div className="w-full px-4 sm:px-8 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-2">
+                        {/* Syncing Indicator */}
+                        {isSyncing && (
+                            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-medium animate-pulse">
+                                <Loader2 size={14} className="animate-spin" />
+                                <span className="hidden sm:inline">동기화 중...</span>
+                            </div>
+                        )}
                         {/* Offline Indicator */}
-                        {!isOnline && (
+                        {!isOnline && !isSyncing && (
                             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-medium animate-pulse">
                                 <WifiOff size={14} />
                                 <span className="hidden sm:inline">Offline</span>
